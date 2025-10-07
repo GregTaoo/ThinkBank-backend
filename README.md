@@ -1,0 +1,12 @@
+.env template
+```dotenv
+BACKEND_PORT=8080
+BACKEND_URL=http://localhost:8080
+POSTGRE_HOST=localhost
+POSTGRE_PORT=11451
+POSTGRE_USER=postgres
+POSTGRE_PASSWORD=123456
+POSTGRE_DB=mydb
+FRONTEND_URL=http://localhost:3000
+MODEL_SERVICE_URL=http://localhost:8001
+```
