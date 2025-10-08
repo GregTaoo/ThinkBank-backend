@@ -44,6 +44,7 @@ func main() {
 	)
 
 	// 数据库的迁移
+	migrate.InitExtensions()
 	migrate.DBMigrateAll()
 	migrate.InitIndices()
 

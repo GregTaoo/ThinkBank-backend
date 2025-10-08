@@ -14,5 +14,9 @@ func DBMigrateAll() {
 		log.Fatal("Files table migration failed:", err)
 	}
 
+	if err := db.Instance().AutoMigrate(&model.Geo{}); err != nil {
+		log.Fatal("Geos table migration failed:", err)
+	}
+
 	log.Println("Table migrations completed")
 }

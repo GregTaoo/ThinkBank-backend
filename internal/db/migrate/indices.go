@@ -12,6 +12,7 @@ const efConstruction = 200
 func InitIndices() {
 	sql := fmt.Sprintf(`
 -- GIN 索引
+ALTER TABLE files ADD COLUMN IF NOT EXISTS tsv tsvector;
 CREATE INDEX IF NOT EXISTS idx_files_tsv
 ON files USING gin(tsv);
 

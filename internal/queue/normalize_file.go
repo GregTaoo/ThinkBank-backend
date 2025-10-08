@@ -13,6 +13,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/restayway/gogis"
 )
 
 func ProduceNormalizeFile(id uint, filePath string) {
@@ -73,10 +75,11 @@ func processFile(fromFS, toFS service.FileService, path string, id uint) string 
 	ext := util.GetFileExt(path)
 	var newData []byte
 	var newExt string
+	var exifInfo *util.ExifInfo
 
 	switch ext {
 	case ".jpg", ".jpeg", ".png", ".webp", ".gif", ".heic", ".livp", ".apng":
-		newData, err = util.ProcessImageToJPEG(data, ext)
+		newData, exifInfo, err = util.ProcessImageToJPEG(data, ext)
 		if err != nil {
 			log.Println("Image process error:", err)
 			return path
@@ -98,6 +101,19 @@ func processFile(fromFS, toFS service.FileService, path string, id uint) string 
 	if err != nil {
 		log.Println("Put file to filesystem error:", err)
 		return path
+	}
+
+	if exifInfo != nil {
+		record := &model.Geo{
+			ID:        id,
+			Latitude:  exifInfo.Latitude,
+			Longitude: exifInfo.Longitude,
+			Geom:      gogis.Point{Lat: exifInfo.Latitude, Lng: exifInfo.Longitude},
+			CreateAt:  exifInfo.CreateAt,
+		}
+		if err := db.Instance().Create(record).Error; err != nil {
+			log.Println("Error while recording EXIF info:", err)
+		}
 	}
 
 	return toPath
