@@ -3,9 +3,9 @@ package api
 import (
 	"ThinkBank-backend/internal/queue"
 	"ThinkBank-backend/internal/service"
+	"ThinkBank-backend/internal/util"
 	"fmt"
 	"mime/multipart"
-	"strings"
 	"time"
 
 	"ThinkBank-backend/internal/db"
@@ -64,7 +64,7 @@ func processSingleFile(file *multipart.FileHeader, fileService service.FileServi
 	}
 	defer func() {
 		if cerr := f.Close(); cerr != nil {
-			fmt.Printf("warning: failed to close file: %v\n", cerr)
+			fmt.Printf("failed to close file: %v", cerr)
 		}
 	}()
 
@@ -76,7 +76,7 @@ func processSingleFile(file *multipart.FileHeader, fileService service.FileServi
 	// 先在数据库创建记录
 	fileRecord := &model.File{
 		FileName: file.Filename,
-		Type:     getFileTypeByExt(file.Filename),
+		Type:     util.GetFileType(file.Filename),
 	}
 	if err := db.Instance().Create(fileRecord).Error; err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func processSingleFile(file *multipart.FileHeader, fileService service.FileServi
 
 	// 构造存储路径
 	subPath := time.Now().Format("2006/01/02")
-	storedFileName := fmt.Sprintf("%d%s", fileRecord.ID, getFileExt(file.Filename))
+	storedFileName := fmt.Sprintf("%d%s", fileRecord.ID, util.GetFileExt(file.Filename))
 
 	// 保存文件
 	savedPath, err := fileService.Put(storedFileName, data, subPath)
@@ -102,27 +102,4 @@ func processSingleFile(file *multipart.FileHeader, fileService service.FileServi
 	queue.ProduceNormalizeFile(fileRecord.ID, savedPath)
 
 	return fileRecord, nil
-}
-
-// getFileExt 获取文件扩展名（包括点号）
-func getFileExt(fileName string) string {
-	idx := strings.LastIndex(fileName, ".")
-	if idx == -1 {
-		return ""
-	}
-	return fileName[idx:]
-}
-
-// getFileTypeByExt 根据后缀返回文件类型
-func getFileTypeByExt(fileName string) string {
-	ext := strings.ToLower(getFileExt(fileName))
-	switch ext {
-	case ".doc", ".docx", ".md", ".txt", ".log",
-		".ppt", ".pptx", ".xls", ".xlsx", ".pdf":
-		return "document"
-	case ".jpg", ".png", ".webp", ".gif", ".heic", ".livp", ".apng":
-		return "image"
-	default:
-		return "unknown"
-	}
 }

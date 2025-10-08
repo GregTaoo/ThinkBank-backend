@@ -16,7 +16,7 @@ func ClearFiles(fs FileService, subPath string, olderThan time.Duration) error {
 	for _, f := range files {
 		if f.ModTime.Before(cutoff) {
 			if err := fs.Delete(f.Name); err != nil {
-				log.Println("文件删除失败:", f.Name, err)
+				log.Println("Failed to delete file:", f.Name, err)
 			}
 		}
 	}

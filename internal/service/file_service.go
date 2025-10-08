@@ -87,7 +87,7 @@ func (l *LocalFileService) List(subPath string) ([]FileInfo, error) {
 		return nil, err
 	}
 	if !info.IsDir() {
-		return nil, fmt.Errorf("%s 不是目录", fullPath)
+		return nil, fmt.Errorf("%s is not a directory", fullPath)
 	}
 
 	entries, err := os.ReadDir(fullPath)

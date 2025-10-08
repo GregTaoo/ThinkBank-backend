@@ -35,7 +35,7 @@ func (s *HTTPModelService) AnalyzeImage(path string) (string, []float32, error) 
 	}
 	defer func() {
 		if e := resp.Body.Close(); e != nil {
-			log.Println("warning: failed to close response body:", e)
+			log.Println("Failed to close response body:", e)
 		}
 	}()
 
@@ -66,7 +66,7 @@ func (s *HTTPModelService) AnalyzeText(text string) ([]float32, error) {
 	}
 	defer func() {
 		if e := resp.Body.Close(); e != nil {
-			log.Println("warning: failed to close response body:", e)
+			log.Println("Failed to close response body:", e)
 		}
 	}()
 
