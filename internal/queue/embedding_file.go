@@ -5,7 +5,6 @@ import (
 	"ThinkBank-backend/internal/model"
 	"ThinkBank-backend/internal/service"
 	"log"
-	"runtime"
 
 	"github.com/pgvector/pgvector-go"
 )
@@ -20,17 +19,16 @@ func ProduceEmbeddingFile(id uint, path string) {
 
 // ConsumeEmbeddingFile 启动 n 个并发消费者处理 embedding_file
 func ConsumeEmbeddingFile(modelService service.ModelService, n int) {
-	GlobalQueue.Consume("embedding_file", func(msg Message) {
-		runtime.NumGoroutine()
+	GlobalQueue.RegisterConsumer("embedding_file", func(msg Message) {
 		payload, ok := msg.Data.(Payload)
 		if !ok {
-			log.Println("invalid payload")
+			log.Println("Invalid payload for embedding file, skipping")
 			return
 		}
 
 		caption, embedding, err := modelService.AnalyzeImage(payload.Path)
 		if err != nil {
-			log.Println("analyze image error:", err)
+			log.Println("Analyze image error:", err)
 			return
 		}
 
@@ -40,7 +38,7 @@ func ConsumeEmbeddingFile(modelService service.ModelService, n int) {
 			"vector":  pgvector.NewVector(embedding),
 		}).Error
 		if err != nil {
-			log.Println("update db error:", err)
+			log.Println("Update database error:", err)
 			return
 		}
 	}, n)

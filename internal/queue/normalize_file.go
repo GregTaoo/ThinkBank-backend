@@ -31,7 +31,7 @@ func ProduceNormalizeFile(id uint, filePath string) {
 }
 
 func ConsumeNormalizeFile(concurrency int, fromFS, toFS service.FileService) {
-	GlobalQueue.Consume("normalize_file", func(msg Message) {
+	GlobalQueue.RegisterConsumer("normalize_file", func(msg Message) {
 		handleNormalizeFile(msg, fromFS, toFS)
 	}, concurrency)
 }
@@ -103,7 +103,7 @@ func processFile(fromFS, toFS service.FileService, path string, id uint) string 
 	// 写入 toFS
 	toPath, err := toFS.Put(storedFileName, newData, newSubPath)
 	if err != nil {
-		fmt.Println("Put file to toFS error:", err)
+		log.Println("Put file to filesystem error:", err)
 		return path
 	}
 
@@ -157,8 +157,7 @@ func extractImageFromLivpRecursive(data []byte) ([]byte, error) {
 			strings.HasSuffix(lcName, ".jpg") ||
 			strings.HasSuffix(lcName, ".jpeg") ||
 			strings.HasSuffix(lcName, ".gif") ||
-			strings.HasSuffix(lcName, ".heic") ||
-			strings.HasSuffix(lcName, ".livp")) {
+			strings.HasSuffix(lcName, ".heic")) {
 			continue
 		}
 

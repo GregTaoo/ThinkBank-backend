@@ -23,11 +23,7 @@ type Queue struct {
 }
 
 // GlobalQueue 全局变量
-var GlobalQueue *Queue
-
-func init() {
-	GlobalQueue = NewQueue()
-}
+var GlobalQueue = NewQueue()
 
 // NewQueue 创建队列
 func NewQueue() *Queue {
@@ -68,8 +64,8 @@ func (q *Queue) Produce(topic string, data any) {
 	}
 }
 
-// Consume 注册消费者，支持 n 个并发消费者
-func (q *Queue) Consume(topic string, handler func(Message), n int) {
+// RegisterConsumer 注册消费者，支持 n 个并发消费者
+func (q *Queue) RegisterConsumer(topic string, handler func(Message), n int) {
 	ch := q.CheckTopic(topic)
 
 	for i := 0; i < n; i++ {
@@ -79,7 +75,7 @@ func (q *Queue) Consume(topic string, handler func(Message), n int) {
 				func() {
 					defer func() {
 						if r := recover(); r != nil {
-							log.Fatal("consumer panic:", r)
+							log.Fatal("Consumer panic:", r)
 						}
 					}()
 					handler(msg)
