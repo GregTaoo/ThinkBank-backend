@@ -11,5 +11,6 @@ type Geo struct {
 	Latitude  float64     `gorm:"not null"`
 	Longitude float64     `gorm:"not null"`
 	Geom      gogis.Point `gorm:"type:geometry(Point,4326);index:idx_geo_geom_gist,type:gist"`
+	Geom3857  gogis.Point `gorm:"type:geometry(Point,3857);index:idx_geo_3857_gist,type:gist"`
 	CreateAt  time.Time
 }

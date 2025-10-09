@@ -99,14 +99,19 @@ func extractImageFromLivpRecursive(data []byte) ([]byte, *ExifInfo, error) {
 }
 
 func extractExifInfo(data []byte) *ExifInfo {
+	var err error
 	x, err := exif.Decode(bytes.NewReader(data))
 	if err != nil {
 		log.Println("Error occurs while extracting EXIF:", err)
 		return nil
 	}
 
-	tm, _ := x.DateTime()
-	lat, long, _ := x.LatLong()
+	tm, err := x.DateTime()
+	lat, long, err := x.LatLong()
+	if err != nil {
+		log.Println("Error occurs while extracting EXIF DateTime and LatLong:", err)
+		return nil
+	}
 
 	exifInfo := new(ExifInfo)
 	exifInfo.Latitude = lat

@@ -50,7 +50,7 @@ func main() {
 
 	// fiber 实例
 	app := fiber.New(fiber.Config{
-		BodyLimit: 100 * 1024 * 1024, // 100 MB
+		BodyLimit: 1000 * 1024 * 1024, // 100 MB
 	})
 
 	// CORS 中间件
@@ -82,6 +82,7 @@ func main() {
 
 	api.RegisterUploadRoutes(app, originalFileService)
 	api.RegisterFileListRoute(app)
+	api.RegisterTripRoutes(app)
 	search.RegisterSearchByText(app, modelService)
 	search.RegisterSearchByImage(app, modelService, tmpFileService)
 
